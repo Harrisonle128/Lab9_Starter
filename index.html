@@ -69,40 +69,160 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button id="log-btn">Console Log</button>
+      <button id="error-btn">Console Error</button>
+      <button id="count-btn">Console Count</button>
+      <button id="warn-btn">Console Warn</button>
+      <button id="assert-btn">Console Assert</button>
+      <button id="clear-btn">Console Clear</button>
+      <button id="dir-btn">Console Dir</button>
+      <button id="dirxml-btn">Console dirxml</button>
+      <button id="group-start-btn">Console Group Start</button>
+      <button id="group-end-btn">Console Group End</button>
+      <button id="table-btn">Console Table</button>
+      <button id="time-btn">Start Timer</button>
+      <button id="time-end-btn">End Timer</button>
+      <button id="trace-btn">Console Trace</button>
+      <button id="global-error-btn">Trigger a Global Error</button>
+      <button id="throw-btn">Throw Custom Error</button>
     </section>
   </main>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "c06bde0752924a9f81537096739ef88c"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
 
   <script>
     let form = document.querySelector('form');
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
-    });
-
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+    
 
     // Start your code here
-    // You may move this JS to another file if you wish
+    // You may move this JS to another file if you wish 
+    let data = {
+      name: "Harrison",
+      course: "CSE110",
+      week: 9
+    }; 
+
+    document.getElementById('log-btn').addEventListener('click', () => {
+      console.log("Console Log:", data);
+    });
+
+    document.getElementById('global-error-btn').addEventListener('click', () => {
+  // Intentionally trigger a ReferenceError
+    nonExistentFunction(); // this function doesn’t exist
+  });
+
+    document.getElementById('error-btn').addEventListener('click', () => {
+      console.error("This is a console.error");
+    });
+
+    document.getElementById('count-btn').addEventListener('click', () => {
+      console.count("Count clicked");
+    });
+
+    document.getElementById('warn-btn').addEventListener('click', () => {
+      console.warn("This is a console.warn");
+    });
+
+    document.getElementById('assert-btn').addEventListener('click', () => {
+      console.assert(false, "Assertion failed: This should not be true");
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      console.clear();
+    });
+
+    document.getElementById('dir-btn').addEventListener('click', () => {
+      console.dir(document.body);
+    });
+
+    document.getElementById('dirxml-btn').addEventListener('click', () => {
+      console.dirxml(document);
+    });
+
+    document.getElementById('group-start-btn').addEventListener('click', () => {
+      console.group("My Group");
+      console.log("Inside the group");
+      console.log("Still inside group");
+    });
+
+    document.getElementById('group-end-btn').addEventListener('click', () => {
+      console.groupEnd();
+    });
+
+    document.getElementById('table-btn').addEventListener('click', () => {
+      console.table([data, { name: "Alice", course: "CSE110", week: 9 }]);
+    });
+
+    document.getElementById('time-btn').addEventListener('click', () => {
+      console.time("Timer");
+    });
+
+    document.getElementById('time-end-btn').addEventListener('click', () => {
+      console.timeEnd("Timer");
+    });
+
+    document.getElementById('trace-btn').addEventListener('click', () => {
+      function traceExample() {
+        console.trace("Trace button pressed");
+      }
+      traceExample();
+    });    
+    
+    form.addEventListener('submit', e => {
+    e.preventDefault();
+    let output = document.querySelector('output');
+    let firstNum = document.querySelector('#first-num').value;
+    let secondNum = document.querySelector('#second-num').value;
+    let operator = document.querySelector('#operator').value;
+
+    try {
+      let result = eval(`${firstNum} ${operator} ${secondNum}`);
+      if (!isFinite(result)) throw new Error("Invalid math operation (NaN or Infinity)");
+      output.innerHTML = result;
+    } catch (err) {
+      console.error("Caught an error during calculation:", err.message);
+      output.innerHTML = "Error: " + err.message;
+    }
+  });
+
+  class CustomCalculationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "CustomCalculationError";
+  }
+}
+
+  document.getElementById('throw-btn').addEventListener('click', () => {
+    try {
+      // Simulate something going wrong
+      let x = prompt("Enter a number:");
+      if (isNaN(x) || x.trim() === "") {
+        throw new CustomCalculationError("That was not a valid number.");
+      }
+      console.log("Valid input:", x);
+    } catch (err) {
+      console.error(`${err.name}: ${err.message}`);
+    } finally {
+      console.log("Custom error check complete.");
+    }
+  });
+
+  window.onerror = function (message, source, lineno, colno, error) {
+  console.log("Global Error Caught!");
+  console.log(`Message: ${message}`);
+  console.log(`Source: ${source}`);
+  console.log(`Line: ${lineno}, Column: ${colno}`);
+  console.log(`Error object:`, error);
+  return true; // prevents browser default error
+};  
   </script>
+
 </body>
 
 </html>
